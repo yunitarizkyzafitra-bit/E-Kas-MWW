@@ -144,24 +144,31 @@
                     <!-- Bagian 1: Informasi Dasar -->
                     <div class="form-section">
                         <h4 class="section-title"><i class="fa-regular fa-folder-open"></i> INFORMASI TRANSAKSI</h4>
-                        <div class="form-grid">
-                            <div class="input-box">
-                                <label>Wilayah / Kategori *</label>
-                                <select id="input-wilayah" required>
-                                    <option value="PALS">Palu Selatan</option>
-                                    <option value="PALB">Palu Barat</option>
-                                    <option value="PALU">Palu Utara</option>
-                                    <option value="MANT">Mantikulore</option>
-                                    <option value="TATA">Tatanga</option>
-                                    <option value="PALT">Palu Timur</option>
-                                </select>
-                            </div>
-                            <div class="input-box">
-                                <label>Tanggal Transaksi *</label>
-                                <input type="date" id="input-tanggal" required>
-                            </div>
-                        </div>
-                    </div>
+                       <!-- Bagian di dalam tab-input -->
+<div class="form-grid">
+    <div class="input-box">
+        <label>Jenis Transaksi *</label>
+        <select id="input-jenis-transaksi">
+            <option value="KREDIT">Pemasukan (Kredit)</option>
+            <option value="DEBIT">Pengeluaran (Debit)</option>
+        </select>
+    </div>
+    <div class="input-box">
+        <label>Nama Penginput *</label>
+        <input type="text" id="input-nama" placeholder="Masukkan nama Anda" required>
+    </div>
+    <div class="input-box full-width">
+        <label>Uraian Arus Kas *</label>
+        <select id="input-uraian">
+            <!-- Data ini akan ditarik dari Spreadsheet via app.js -->
+            <option value="">Memuat data dari spreadsheet...</option>
+        </select>
+    </div>
+    <div class="input-box full-width">
+        <label>Jumlah Nominal *</label>
+        <input type="number" id="input-nominal" placeholder="0" required>
+    </div>
+</div>                    </div>
 
                     <!-- Bagian 2: Detail Finansial -->
                     <div class="form-section">
