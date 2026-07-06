@@ -3,34 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kas MWW</title>
+    <title>E-Kas Terpadu MWW</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- STATUS KONEKSI -->
-    <div id="connection-status">SISTEM TERHUBUNG (MODE ONLINE)</div>
+    <!-- STATUS KONEKSI (Sesuai Gambar) -->
+    <div id="connection-status">
+        <i class="fa-solid fa-signal" style="margin-right: 8px;"></i> SISTEM TERHUBUNG (MODE ONLINE)
+    </div>
 
-    <!-- HALAMAN LOGIN -->
+    <!-- HALAMAN LOGIN (Sesuai Gambar) -->
     <div id="login-screen" class="screen">
         <div class="login-card">
-            <!-- Ganti src dengan link logo asli Anda jika ada -->
-            <div class="logo-container">
-    <img src="https://wahdah.or.id/logo-wahdah-png/" alt="https://wahdah.or.id/logo-wahdah-png/" style="width: 100%; height: 100%; border-radius: 15px; object-fit: contain;">
-</div>            <h3>DPW SULAWESI TENGAH</h3>
+            <!-- Ganti src dengan logo-mww.png jika sudah diunggah -->
+           <div class="logo-container">
+    <img src="logo-mww.png" alt="Logo MWW" style="width: 100%; height: 100%; border-radius: 20px; object-fit: contain;">
+</div>
+            <h3>DPW SULAWESI TENGAH</h3>
             <h2>MUSLIMAH WAHDAH ISLAMIYAH</h2>
             
             <div class="input-group">
                 <label>USERNAME</label>
-                <input type="text" id="username" placeholder="Masukkan username">
+                <input type="text" id="username" autocomplete="off">
             </div>
 
             <div class="input-group">
                 <label>KATA SANDI</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Masukkan kata sandi">
-                    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword()"></i>
+                    <input type="password" id="password">
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword()"></i>
                 </div>
             </div>
 
@@ -39,25 +42,96 @@
         </div>
     </div>
 
-    <!-- HALAMAN DASBOR -->
+    <!-- HALAMAN DASBOR DENGAN BERBAGAI FITUR -->
     <div id="dashboard-screen" class="screen hidden">
-        <div class="dashboard-header">
-            <h2>Dasbor E-Kas MWW</h2>
-            <button class="logout-btn" onclick="logout()">Keluar</button>
-        </div>
-        
-        <div class="dashboard-content">
-            <div class="form-card">
-                <h3>Input Kas Baru</h3>
-                <form id="kas-form">
-                    <input type="date" id="input-tanggal" required>
-                    <input type="text" id="input-jenis" placeholder="Jenis Arus Kas (mis: Biaya Administrasi)" required>
-                    <input type="number" id="input-debit" placeholder="Debit (Uang Keluar)" value="0" required>
-                    <input type="number" id="input-kredit" placeholder="Kredit (Uang Masuk)" value="0" required>
-                    <input type="text" id="input-kategori" placeholder="Uraian Kategori (mis: Umum/Admin)" required>
-                    <button type="submit" id="submit-btn">Simpan Data</button>
-                </form>
-                <p id="sync-info" style="font-size: 12px; margin-top: 10px; color: #f39c12;"></p>
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div class="header-title">
+                    <h2>Dasbor Utama E-Kas</h2>
+                    <p>Manajemen Data Terintegrasi</p>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-power-off"></i> Keluar</button>
+            </div>
+            
+            <!-- Fitur Widget Ringkasan -->
+            <div class="summary-widgets">
+                <div class="widget">
+                    <h4>Total Saldo Aktif</h4>
+                    <h2 id="total-saldo">Rp 0</h2>
+                </div>
+                <div class="widget">
+                    <h4>Status Antrean Offline</h4>
+                    <h2 id="sync-info" class="text-warning">0 Data</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- Fitur Form Input Terstruktur -->
+                <div class="form-card">
+                    <h3>Input Transaksi Baru</h3>
+                    <form id="kas-form">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Kode Wilayah</label>
+                                <select id="input-wilayah" required>
+                                    <option value="PALS">Palu Selatan</option>
+                                    <option value="PALB">Palu Barat</option>
+                                    <option value="PALU">Palu Utara</option>
+                                    <option value="MANT">Mantikulore</option>
+                                    <option value="TATA">Tatanga</option>
+                                    <option value="PALT">Palu Timur</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Tanggal Transaksi</label>
+                                <input type="date" id="input-tanggal" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Jenis Arus Kas</label>
+                            <input type="text" id="input-jenis" placeholder="Contoh: Biaya Administrasi" required>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Debit (Uang Keluar)</label>
+                                <input type="number" id="input-debit" value="0" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Kredit (Uang Masuk)</label>
+                                <input type="number" id="input-kredit" value="0" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Uraian Kategori</label>
+                            <input type="text" id="input-kategori" placeholder="Contoh: Umum/Admin" required>
+                        </div>
+
+                        <button type="submit" id="submit-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data ke Spreadsheet</button>
+                    </form>
+                </div>
+
+                <!-- Fitur Tabel Riwayat Terakhir -->
+                <div class="table-card">
+                    <h3>Riwayat Transaksi Lokal</h3>
+                    <div class="table-responsive">
+                        <table id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Jenis</th>
+                                    <th>Kategori</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <!-- Data akan masuk via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
