@@ -1,20 +1,21 @@
 // Konfigurasi
 const VALID_USERNAME = "muslimah";
 const VALID_PASSWORD = "bismillah";
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzISwvKYZwX6LFq8fFzWdH89FxdotfIbBxI78eYtyGol7k5C2kln7SC59xINt2Oho22kQ/exec'; // Masukkan URL Deploy Anda di sini!
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBf0YkC7BSqWLLB583KWlVU_hMdDaaMIEidqas-PYL2lJO1JtpNfmWXrY3MhN9xek0/exec'; 
 
 // Elements
 const loginScreen = document.getElementById('login-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const connStatus = document.getElementById('connection-status');
 const syncInfo = document.getElementById('sync-info');
+const historyBody = document.getElementById('history-body');
 
-// Cek status login saat dimuat
+let serialNumberCounter = 1;
+
 if(localStorage.getItem('isLoggedIn') === 'true') {
     showDashboard();
 }
 
-// Toggle Password
 function togglePassword() {
     const pwdInput = document.getElementById('password');
     const eyeIcon = document.querySelector('.toggle-password');
@@ -29,7 +30,6 @@ function togglePassword() {
     }
 }
 
-// Login Logic
 function login() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
@@ -54,37 +54,52 @@ function logout() {
 function showDashboard() {
     loginScreen.classList.add('hidden');
     dashboardScreen.classList.remove('hidden');
+    loadHistoryTable();
 }
 
-// Offline/Online Detection
+// Deteksi Status Jaringan
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 
 function updateOnlineStatus() {
     if (navigator.onLine) {
         document.body.classList.remove('offline');
-        connStatus.innerText = "SISTEM TERHUBUNG (MODE ONLINE)";
-        connStatus.style.backgroundColor = "#2c3e50";
-        syncOfflineData(); // Coba sinkronisasi saat kembali online
+        connStatus.innerHTML = '<i class="fa-solid fa-signal" style="margin-right: 8px;"></i> SISTEM TERHUBUNG (MODE ONLINE)';
+        syncOfflineData(); 
     } else {
         document.body.classList.add('offline');
-        connStatus.innerText = "TIDAK ADA JARINGAN (MODE OFFLINE - DATA AKAN DISIMPAN)";
-        connStatus.style.backgroundColor = "#e74c3c";
+        connStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> MODE OFFLINE - DATA DISIMPAN LOKAL';
     }
+}
+
+// Generate Nomor Transaksi Otomatis dengan Kode Wilayah
+function generateTransactionID(wilayah) {
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    const countStr = String(serialNumberCounter).padStart(3, '0');
+    serialNumberCounter++;
+    return `MWW-${wilayah}-${month}${year}-${countStr}`;
 }
 
 // Handle Form Submit
 document.getElementById('kas-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    const wilayah = document.getElementById('input-wilayah').value;
+    const transID = generateTransactionID(wilayah);
+    
     const data = {
+        id: transID, // Nomor urut/transaksi berstruktur
         tanggal: document.getElementById('input-tanggal').value,
         jenisArusKas: document.getElementById('input-jenis').value,
         debit: document.getElementById('input-debit').value,
         kredit: document.getElementById('input-kredit').value,
         kategori: document.getElementById('input-kategori').value,
-        id: Date.now() // ID unik untuk antrean offline
+        timestamp: Date.now()
     };
+
+    saveToHistoryLocal(data);
 
     if (navigator.onLine) {
         sendDataToSheet(data);
@@ -92,15 +107,16 @@ document.getElementById('kas-form').addEventListener('submit', function(e) {
         saveOfflineData(data);
     }
     
-    this.reset();
+    // Reset form parsial
+    document.getElementById('input-jenis').value = '';
     document.getElementById('input-debit').value = 0;
     document.getElementById('input-kredit').value = 0;
+    document.getElementById('input-kategori').value = '';
 });
 
-// Fungsi Kirim ke Google Sheets
 function sendDataToSheet(data) {
     const btn = document.getElementById('submit-btn');
-    btn.innerText = "Menyimpan...";
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
     btn.disabled = true;
 
     fetch(GOOGLE_APP_SCRIPT_URL, {
@@ -109,60 +125,72 @@ function sendDataToSheet(data) {
     })
     .then(response => response.json())
     .then(result => {
-        alert("Data berhasil disimpan ke Spreadsheet!");
-        btn.innerText = "Simpan Data";
+        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data ke Spreadsheet';
         btn.disabled = false;
     })
     .catch(error => {
-        // Jika gagal karena jaringan labil, simpan ke offline
         saveOfflineData(data);
-        btn.innerText = "Simpan Data";
+        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data ke Spreadsheet';
         btn.disabled = false;
     });
 }
 
-// Fungsi Simpan Offline (LocalStorage)
+// Manajemen Offline & Riwayat
 function saveOfflineData(data) {
     let offlineQueue = JSON.parse(localStorage.getItem('kasOfflineQueue')) || [];
     offlineQueue.push(data);
     localStorage.setItem('kasOfflineQueue', JSON.stringify(offlineQueue));
-    alert("Anda sedang offline. Data disimpan lokal dan akan disinkronkan saat online.");
     checkOfflineQueue();
 }
 
-// Cek antrean
 function checkOfflineQueue() {
     let offlineQueue = JSON.parse(localStorage.getItem('kasOfflineQueue')) || [];
-    if(offlineQueue.length > 0) {
-        syncInfo.innerText = `Ada ${offlineQueue.length} data menunggu untuk disinkronisasi.`;
-    } else {
-        syncInfo.innerText = "";
-    }
+    syncInfo.innerText = `${offlineQueue.length} Data Menunggu Sync`;
+    if(offlineQueue.length > 0) syncInfo.style.color = "#f39c12";
+    else syncInfo.style.color = "#2ecc71";
 }
 
-// Sinkronisasi data offline saat online
 function syncOfflineData() {
     let offlineQueue = JSON.parse(localStorage.getItem('kasOfflineQueue')) || [];
     if (offlineQueue.length > 0) {
-        syncInfo.innerText = "Mensinkronisasikan data offline...";
-        
-        // Loop antrean dan kirim satu per satu
+        syncInfo.innerText = "Mensinkronkan...";
         offlineQueue.forEach(data => {
             fetch(GOOGLE_APP_SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                // Hapus dari antrean jika berhasil
+            .then(() => {
                 offlineQueue = offlineQueue.filter(item => item.id !== data.id);
                 localStorage.setItem('kasOfflineQueue', JSON.stringify(offlineQueue));
                 checkOfflineQueue();
-            })
-            .catch(e => console.error("Gagal sync:", e));
+            }).catch(() => {});
         });
     }
 }
 
-// Inisialisasi status awal
+function saveToHistoryLocal(data) {
+    let history = JSON.parse(localStorage.getItem('kasHistory')) || [];
+    history.unshift(data); 
+    if(history.length > 5) history.pop(); 
+    localStorage.setItem('kasHistory', JSON.stringify(history));
+    loadHistoryTable();
+}
+
+function loadHistoryTable() {
+    let history = JSON.parse(localStorage.getItem('kasHistory')) || [];
+    historyBody.innerHTML = '';
+    history.forEach(row => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${row.id}</td>
+            <td>${row.tanggal}</td>
+            <td>${row.jenisArusKas}</td>
+            <td>${row.kategori}</td>
+        `;
+        historyBody.appendChild(tr);
+    });
+}
+
+// Inisialisasi awal
 updateOnlineStatus();
 checkOfflineQueue();
