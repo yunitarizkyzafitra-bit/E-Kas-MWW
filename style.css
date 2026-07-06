@@ -1,15 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg-dark: #111317; 
-    --bg-light: #f4f6f9;
-    --sidebar-bg: #152238; /* Biru gelap khas dashboard korporat */
-    --sidebar-hover: #1e3050;
-    --primary-blue: #0056b3;
-    --card-white: #ffffff;
-    --text-dark: #333333;
-    --text-muted: #6c757d;
-    --border-color: #e9ecef;
+    --primary-blue: #008080; /* Warna Tosca */
+    --sidebar-bg: #004d4d;   /* Tosca lebih gelap untuk sidebar */
+    --sidebar-hover: #006666;
+    /* ... variabel lainnya tetap sama */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
