@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Kas MWW</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- STATUS KONEKSI -->
+    <div id="connection-status">SISTEM TERHUBUNG (MODE ONLINE)</div>
+
+    <!-- HALAMAN LOGIN -->
+    <div id="login-screen" class="screen">
+        <div class="login-card">
+            <!-- Ganti src dengan link logo asli Anda jika ada -->
+            <div class="logo-container">
+    <img src="https://wahdah.or.id/logo-wahdah-png/" alt="https://wahdah.or.id/logo-wahdah-png/" style="width: 100%; height: 100%; border-radius: 15px; object-fit: contain;">
+</div>            <h3>DPW SULAWESI TENGAH</h3>
+            <h2>MUSLIMAH WAHDAH ISLAMIYAH</h2>
+            
+            <div class="input-group">
+                <label>USERNAME</label>
+                <input type="text" id="username" placeholder="Masukkan username">
+            </div>
+
+            <div class="input-group">
+                <label>KATA SANDI</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Masukkan kata sandi">
+                    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword()"></i>
+                </div>
+            </div>
+
+            <button onclick="login()">MASUK SISTEM</button>
+            <p id="login-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <!-- HALAMAN DASBOR -->
+    <div id="dashboard-screen" class="screen hidden">
+        <div class="dashboard-header">
+            <h2>Dasbor E-Kas MWW</h2>
+            <button class="logout-btn" onclick="logout()">Keluar</button>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="form-card">
+                <h3>Input Kas Baru</h3>
+                <form id="kas-form">
+                    <input type="date" id="input-tanggal" required>
+                    <input type="text" id="input-jenis" placeholder="Jenis Arus Kas (mis: Biaya Administrasi)" required>
+                    <input type="number" id="input-debit" placeholder="Debit (Uang Keluar)" value="0" required>
+                    <input type="number" id="input-kredit" placeholder="Kredit (Uang Masuk)" value="0" required>
+                    <input type="text" id="input-kategori" placeholder="Uraian Kategori (mis: Umum/Admin)" required>
+                    <button type="submit" id="submit-btn">Simpan Data</button>
+                </form>
+                <p id="sync-info" style="font-size: 12px; margin-top: 10px; color: #f39c12;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
