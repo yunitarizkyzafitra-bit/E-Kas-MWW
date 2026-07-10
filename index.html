@@ -3,247 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kas MWW Sulteng</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Aplikasi Kas MWW Sulteng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-100 font-sans">
 
-    <!-- STATUS KONEKSI -->
-    <div id="connection-status">
-        <i class="fa-solid fa-signal" style="margin-right: 8px;"></i> SISTEM TERHUBUNG (MODE ONLINE)
+    <!-- =========================================================================
+         1. SCREEN LOGIN (DENGAN TOGGLE MATA KATASANDI)
+         ========================================================================= -->
+    <div id="screen-login" class="min-h-screen flex items-center justify-center p-4">
+        <form id="form-login" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm">
+            <h2 class="text-xl font-black text-slate-800 mb-6 text-center">LOGIN AKSES</h2>
+            <div class="mb-4">
+                <input type="text" id="login-username" placeholder="Username" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+            </div>
+            <!-- Kolom Password + Toggle Ikon Mata -->
+            <div class="mb-6 relative">
+                <input type="password" id="login-password" placeholder="Password" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+                <div class="absolute right-4 top-4 text-slate-400 cursor-pointer" onclick="togglePassword('login-password', 'icon-mata')">
+                    <i id="icon-mata" class="fa-solid fa-eye"></i>
+                </div>
+            </div>
+            <button type="submit" id="btn-login" class="w-full bg-teal-600 text-white font-bold p-3 rounded-xl hover:bg-teal-700 transition">MASUK</button>
+            <p id="error-login" class="hidden text-rose-500 text-xs text-center mt-4 font-bold">Username/Password Salah!</p>
+        </form>
     </div>
 
-    <!-- HALAMAN LOGIN (TIDAK DIRUBAH) -->
-    <div id="login-screen" class="screen">
-        <div class="login-card">
-            <div class="logo-container">
-                <img src="logo-mww.png" alt="Logo MWW" style="width: 100%; height: 100%; border-radius: 20px; object-fit: contain;">
-            </div>
-            <h3>DPW SULAWESI TENGAH</h3>
-            <h2>MUSLIMAH WAHDAH ISLAMIYAH</h2>
-            
-            <div class="input-group">
-                <label>USERNAME</label>
-                <input type="text" id="username" autocomplete="off">
-            </div>
-
-            <div class="input-group">
-                <label>KATA SANDI</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password">
-                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassword()"></i>
-                </div>
-            </div>
-
-            <button onclick="login()">MASUK SISTEM</button>
-            <p id="login-error" class="error-msg"></p>
-        </div>
-    </div>
-
-    <!-- HALAMAN DASBOR PROFESIONAL -->
-    <div id="dashboard-screen" class="screen hidden">
-        
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fa-solid fa-book-quran"></i>
-                <div>
-                    <h4>E-KAS MWW</h4>
-                    <p>DPW Sulawesi Tengah</p>
-                </div>
-            </div>
-            
-            <ul class="sidebar-menu">
-                <li class="active" onclick="switchTab('tab-dashboard', this)">
-                    <i class="fa-solid fa-chart-pie"></i> Dasbor Ringkasan
-                </li>
-                <li onclick="switchTab('tab-input', this)">
-                    <i class="fa-solid fa-keyboard"></i> Entri Data Kas
-                </li>
-                <li onclick="switchTab('tab-laporan', this)">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
-                </li>
-            </ul>
-
-            <div class="sidebar-stats">
-                <h5><i class="fa-solid fa-bolt"></i> Statistik Cepat</h5>
-                <p>Total Transaksi: <span id="quick-total">0</span></p>
-                <p>Status: <span class="text-green">Online</span></p>
-                <p id="quick-date" style="font-size: 10px; margin-top: 10px; color: #8898aa;"></p>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <i class="fa-solid fa-user-circle"></i>
-                    <div>
-                        <span>Administrator</span>
-                        <small>Sistem Online</small>
-                    </div>
-                </div>
-                <button onclick="logout()" title="Keluar"><i class="fa-solid fa-right-from-bracket"></i></button>
+    <!-- =========================================================================
+         2. SCREEN DASHBOARD
+         ========================================================================= -->
+    <div id="screen-dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar Menu -->
+        <div class="w-full md:w-64 bg-slate-900 p-6">
+            <h1 class="text-white font-black mb-6 text-center md:text-left">MWW SULTENG</h1>
+            <div class="flex md:flex-col gap-2 justify-center md:justify-start">
+                <button onclick="pindahMenu('menu-ringkasan')" id="btn-menu-ringkasan" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl bg-teal-600 text-white">
+                    <i class="fa-solid fa-chart-pie"></i> Ringkasan
+                </button>
+                <button onclick="pindahMenu('menu-tambah')" id="btn-menu-tambah" class="nav-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-plus"></i> Tambah Transaksi
+                </button>
             </div>
         </div>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
             
-            <!-- TAB 1: DASBOR ANALITIK -->
-            <div id="tab-dashboard" class="tab-content active-tab">
-                <div class="content-header">
-                    <div>
-                        <h2>DASBOR KEUANGAN E-KAS</h2>
-                        <p>Ringkasan arus kas dan analitik real-time.</p>
+            <!-- MENU 1: RINGKASAN KAS -->
+            <div id="menu-ringkasan" class="menu-content">
+                <h2 class="text-lg font-black text-slate-800 mb-4">RINGKASAN KAS</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Saldo Awal</p>
+                        <p id="card-saldo-awal" class="font-black text-slate-800 text-sm md:text-base">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <p class="text-[10px] text-teal-600 font-bold uppercase">Pendapatan</p>
+                        <p id="card-pemasukkan" class="font-black text-teal-600 text-sm md:text-base">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <p class="text-[10px] text-rose-600 font-bold uppercase">Pengeluaran</p>
+                        <p id="card-pengeluaran" class="font-black text-rose-600 text-sm md:text-base">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <p class="text-[10px] text-slate-500 font-bold uppercase">Saldo Akhir</p>
+                        <p id="card-saldo-akhir" class="font-black text-slate-700 text-sm md:text-base">Rp 0</p>
                     </div>
                 </div>
 
-                <div class="summary-cards">
-                    <div class="card card-blue">
-                        <p>Total Saldo Aktif</p>
-                        <h3 id="dash-saldo">Rp 0</h3>
-                        <small>Akumulasi keseluruhan</small>
-                    </div>
-                    <div class="card card-green">
-                        <p>Total Pemasukan (Kredit)</p>
-                        <h3 id="dash-kredit">Rp 0</h3>
-                        <small>Uang masuk terdata</small>
-                    </div>
-                    <div class="card card-orange">
-                        <p>Total Pengeluaran (Debit)</p>
-                        <h3 id="dash-debit">Rp 0</h3>
-                        <small>Uang keluar terdata</small>
-                    </div>
-                    <div class="card card-purple">
-                        <p>Antrean Sinkronisasi</p>
-                        <h3 id="dash-sync">0 Data</h3>
-                        <small>Menunggu diunggah</small>
-                    </div>
-                </div>
+                <select id="filter-periode-bulan" class="w-full p-3 rounded-xl border border-slate-200 mb-4 outline-none text-xs font-bold bg-white text-slate-700">
+                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                </select>
 
-                <div class="chart-section">
-                    <div class="chart-box">
-                        <h4>Rasio Pemasukan vs Pengeluaran</h4>
-                        <div class="progress-container">
-                            <div class="progress-bar bg-green" id="bar-kredit" style="width: 50%;">Pemasukan</div>
-                            <div class="progress-bar bg-orange" id="bar-debit" style="width: 50%;">Pengeluaran</div>
-                        </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 text-slate-400 font-bold uppercase border-b border-slate-100">
+                                <tr>
+                                    <th class="p-3">Tanggal</th>
+                                    <th class="p-3">Nama Input</th>
+                                    <th class="p-3">Jenis</th>
+                                    <th class="p-3 text-right">Pengeluaran</th>
+                                    <th class="p-3 text-right">Pendapatan</th>
+                                    <th class="p-3">Uraian</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-kas-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: FORM ENTRI DATA -->
-            <div id="tab-input" class="tab-content hidden">
-                <div class="content-header">
-                    <div>
-                        <h2>FORM ENTRI DATA KAS</h2>
-                        <p>Silakan isi informasi transaksi kas pada formulir di bawah ini.</p>
-                    </div>
-                </div>
-
-                <form id="kas-form" class="professional-form">
-                    <!-- Bagian 1: Informasi Dasar -->
-                    <div class="form-section">
-                        <h4 class="section-title"><i class="fa-regular fa-folder-open"></i> INFORMASI TRANSAKSI</h4>
-                       <!-- Bagian di dalam tab-input -->
-<div class="form-grid">
-    <div class="input-box">
-        <label>Jenis Transaksi *</label>
-        <select id="input-jenis-transaksi">
-            <option value="KREDIT">Pemasukan (Kredit)</option>
-            <option value="DEBIT">Pengeluaran (Debit)</option>
-        </select>
-    </div>
-    <div class="input-box">
-        <label>Nama Penginput *</label>
-        <input type="text" id="input-nama" placeholder="Masukkan nama Anda" required>
-    </div>
-    <div class="input-box full-width">
-        <label>Uraian Arus Kas *</label>
-        <select id="input-uraian">
-            <!-- Data ini akan ditarik dari Spreadsheet via app.js -->
-            <option value="">Memuat data dari spreadsheet...</option>
-        </select>
-    </div>
-    <div class="input-box full-width">
-        <label>Jumlah Nominal *</label>
-        <input type="number" id="input-nominal" placeholder="0" required>
-    </div>
-</div>                    </div>
-
-                    <!-- Bagian 2: Detail Finansial -->
-                    <div class="form-section">
-                        <h4 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> DETAIL ARUS KAS</h4>
-                        <div class="form-grid">
-                            <div class="input-box full-width">
-                                <label>Jenis Arus Kas *</label>
-                                <input type="text" id="input-jenis" placeholder="Contoh: Biaya Administrasi, Pemindahbukuan..." required>
-                            </div>
-                            <div class="input-box">
-                                <label>Debit (Pengeluaran) *</label>
-                                <div class="currency-input">
-                                    <span>Rp</span>
-                                    <input type="number" id="input-debit" value="0" min="0" required>
-                                </div>
-                            </div>
-                            <div class="input-box">
-                                <label>Kredit (Pemasukan) *</label>
-                                <div class="currency-input">
-                                    <span>Rp</span>
-                                    <input type="number" id="input-kredit" value="0" min="0" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bagian 3: Uraian Tambahan -->
-                    <div class="form-section">
-                        <h4 class="section-title"><i class="fa-solid fa-align-left"></i> KETERANGAN URAIAN</h4>
-                        <div class="form-grid">
-                            <div class="input-box full-width">
-                                <label>Uraian Kategori Laporan *</label>
-                                <input type="text" id="input-kategori" placeholder="Contoh: Umum/Admin, Logistik, Qurban..." required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> SIMPAN REKAMAN</button>
-                        <button type="button" class="btn-clear" onclick="document.getElementById('kas-form').reset();"><i class="fa-solid fa-plus"></i> ENTRI BARU (BERSIHKAN)</button>
-                    </div>
+            <!-- MENU 2: TAMBAH TRANSAKSI -->
+            <div id="menu-tambah" class="menu-content hidden">
+                <form id="form-transaksi" class="bg-white p-6 rounded-2xl border border-slate-200 max-w-sm mx-auto shadow-sm">
+                    <h2 class="font-black text-slate-800 mb-4 uppercase text-center text-sm tracking-wider">Input Transaksi Kas</h2>
+                    
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">TANGGAL TRANSAKSI</label>
+                    <input type="date" id="ins-tanggal" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-xs outline-none">
+                    
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">NAMA PENGINPUT</label>
+                    <input type="text" id="ins-nama" placeholder="Masukkan Nama Anda" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-xs outline-none">
+                    
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">JENIS ALIRAN DANA</label>
+                    <select id="ins-jenis" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-xs outline-none">
+                        <option value="Kas Masuk">Dana Pendapatan (Kas Masuk)</option>
+                        <option value="Kas Keluar">Dana Pengeluaran (Kas Keluar)</option>
+                    </select>
+                    
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">NOMINAL (RP)</label>
+                    <input type="number" id="ins-nominal" placeholder="Contoh: 50000" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 text-xs outline-none">
+                    
+                    <label class="text-[10px] font-bold text-slate-400 block mb-1">URAIAN / KETERANGAN</label>
+                    <input type="text" id="ins-uraian" placeholder="Uraian keterangan transaksi" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl mb-4 text-xs outline-none">
+                    
+                    <button type="submit" id="btn-simpan" class="w-full bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-xl font-bold text-xs uppercase tracking-wider transition">SIMPAN KE SPREADSHEET</button>
                 </form>
             </div>
 
-            <!-- TAB 3: LAPORAN KEUANGAN -->
-            <div id="tab-laporan" class="tab-content hidden">
-                <div class="content-header">
-                    <div>
-                        <h2>BUKU BESAR & LAPORAN</h2>
-                        <p>Daftar riwayat transaksi yang tersimpan secara lokal dan sinkronisasi.</p>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table class="report-table">
-                        <thead>
-                            <tr>
-                                <th>ID Transaksi</th>
-                                <th>Tanggal</th>
-                                <th>Uraian Kategori</th>
-                                <th>Jenis Arus Kas</th>
-                                <th>Debit (Rp)</th>
-                                <th>Kredit (Rp)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-body">
-                            <!-- Data akan dimuat via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- =========================================================================
+         3. LOGIKA JAVASCRIPT ENGINE
+         ========================================================================= -->
+    <script>
+    // URL API Jembatan Spreadsheet Anda
+    const URL_API = "https://script.google.com/macros/s/AKfycbwfRQkG3-DIapAgG9uYHq7k8uInWqwrE_XdQ19D3-Fn90T-lWDFZKiaJhrRj0g4Kzif/exec"; 
+
+    let serverMasterSaldoAwal = 16152981; 
+    let listTransaksiGlobal = [];
+
+    // Fungsi Pengaktif Toggle Mata Password
+    function togglePassword(idInput, idIcon) {
+        const input = document.getElementById(idInput);
+        const icon = document.getElementById(idIcon);
+        if (input && icon) {
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "fa-solid fa-eye-slash"; // Mata coret saat kelihatan
+            } else {
+                input.type = "password";
+                icon.className = "fa-solid fa-eye"; // Mata normal saat tersembunyi
+            }
+        }
+    }
+
+    function pindahMenu(menuId) {
+        document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(menuId).classList.remove('hidden');
+
+        document.querySelectorAll('.nav-link').forEach(btn => {
+            btn.className = "nav-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white";
+        });
+        
+        const activeBtn = document.getElementById('btn-' + menuId);
+        if (activeBtn) activeBtn.className = "nav-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl bg-teal-600 text-white";
+    }
+
+    // Verifikasi Kredensial Khusus Muslimah & Bismillah
+    document.getElementById('form-login').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const u = document.getElementById('login-username').value.trim();
+        const p = document.getElementById('login-password').value.trim();
+        const err = document.getElementById('error-login');
+
+        if (u === "muslimah" && p === "bismillah") {
+            err.classList.add('hidden');
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+            tarikDataKasServer();
+        } else {
+            err.classList.remove('hidden');
+        }
+    });
+
+    function tarikDataKasServer() {
+        fetch(`${URL_API}?action=read`)
+            .then(r => r.json())
+            .then(res => {
+                if (res && res.transaksi) {
+                    serverMasterSaldoAwal = res.masterSaldoAwal || 16152981;
+                    listTransaksiGlobal = res.transaksi;
+                }
+                kalkulasiDanRenderTabelLayar();
+            }).catch(() => kalkulasiDanRenderTabelLayar());
+    }
+
+    function kalkulasiDanRenderTabelLayar() {
+        const filterBulan = document.getElementById('filter-periode-bulan');
+        const bulanDipilih = parseInt(filterBulan.value);
+        const tbody = document.getElementById('tabel-kas-body');
+        tbody.innerHTML = '';
+
+        let dataPerBulan = [];
+        for (let i = 0; i < 12; i++) {
+            dataPerBulan[i] = { saldoAwal: 0, totalKredit: 0, totalDebit: 0, saldoAkhir: 0, transaksi: [] };
+        }
+
+        listTransaksiGlobal.forEach(item => {
+            let tgl = new Date(item.tanggal);
+            if (!isNaN(tgl.getTime())) {
+                let blnIndex = tgl.getMonth();
+                dataPerBulan[blnIndex].transaksi.push(item);
+                dataPerBulan[blnIndex].totalKredit += item.kredit;
+                dataPerBulan[blnIndex].totalDebit += item.debit;
+            }
+        });
+
+        let saldoEstafet = serverMasterSaldoAwal;
+        for (let i = 0; i < 12; i++) {
+            dataPerBulan[i].saldoAwal = saldoEstafet;
+            dataPerBulan[i].saldoAkhir = (dataPerBulan[i].saldoAwal + dataPerBulan[i].totalKredit) - dataPerBulan[i].totalDebit;
+            saldoEstafet = dataPerBulan[i].saldoAkhir;
+        }
+
+        let bulanAktif = dataPerBulan[bulanDipilih];
+        if (bulanAktif.transaksi.length > 0) {
+            bulanAktif.transaksi.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3 text-slate-500">${item.tanggal}</td>
+                        <td class="p-3 text-slate-700 font-bold">${item.nama}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.jenis.includes('Masuk') ? 'bg-teal-100 text-teal-800' : 'bg-rose-100 text-rose-800'}">${item.jenis}</span></td>
+                        <td class="p-3 text-right text-rose-600 font-bold">${item.debit > 0 ? 'Rp '+item.debit.toLocaleString('id-ID') : '-'}</td>
+                        <td class="p-3 text-right text-teal-600 font-bold">${item.kredit > 0 ? 'Rp '+item.kredit.toLocaleString('id-ID') : '-'}</td>
+                        <td class="p-3 text-slate-600">${item.uraian}</td>
+                    </tr>`;
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Tidak ada transaksi bulan ini.</td></tr>`;
+        }
+
+        document.getElementById('card-saldo-awal').innerText = "Rp " + bulanAktif.saldoAwal.toLocaleString('id-ID');
+        document.getElementById('card-pemasukkan').innerText = "Rp " + bulanAktif.totalKredit.toLocaleString('id-ID');
+        document.getElementById('card-pengeluaran').innerText = "Rp " + bulanAktif.totalDebit.toLocaleString('id-ID');
+        document.getElementById('card-saldo-akhir').innerText = "Rp " + bulanAktif.saldoAkhir.toLocaleString('id-ID');
+    }
+
+    document.getElementById('form-transaksi').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btn-simpan');
+        btn.disabled = true;
+
+        let dataObjek = {
+            id: "TX-" + Date.now(),
+            tanggal: document.getElementById('ins-tanggal').value,
+            nama: document.getElementById('ins-nama').value.trim(),
+            jenis: document.getElementById('ins-jenis').value,
+            kredit: document.getElementById('ins-jenis').value.includes('Masuk') ? Number(document.getElementById('ins-nominal').value) : 0,
+            debit: document.getElementById('ins-jenis').value.includes('Keluar') ? Number(document.getElementById('ins-nominal').value) : 0,
+            uraian: document.getElementById('ins-uraian').value.trim()
+        };
+
+        fetch(URL_API, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "create", data: dataObjek })
+        }).then(() => {
+            alert("Transaksi Berhasil Disimpan!");
+            document.getElementById('form-transaksi').reset();
+            tarikDataKasServer();
+            pindahMenu('menu-ringkasan');
+        }).finally(() => btn.disabled = false);
+    });
+
+    document.getElementById('filter-periode-bulan').addEventListener('change', kalkulasiDanRenderTabelLayar);
+    </script>
 </body>
 </html>
